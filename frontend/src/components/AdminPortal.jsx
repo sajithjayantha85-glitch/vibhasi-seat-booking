@@ -42,9 +42,15 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
   const [selectedAdminSeats, setSelectedAdminSeats] = useState([]);
   const [rowBulkSelect, setRowBulkSelect] = useState({ rowLabel: 'A', blockSide: 'ALL', action: 'BLOCK' });
   const [actionMessage, setActionMessage] = useState('');
+  const [dbStatus, setDbStatus] = useState(null);
 
-  // Fetch attendees list when authenticated
+  // Fetch attendees list and database health status
   useEffect(() => {
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(data => setDbStatus(data))
+      .catch(() => {});
+
     if (isAuthenticated) {
       fetchAttendees();
     }
@@ -320,6 +326,19 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
             <p className="text-[11px] text-slate-400">
               ආසන පාලනය හා නිල වාර්තා ලබාගැනීමට කරුණාකර මුරපදය ඇතුළත් කරන්න
             </p>
+
+            {dbStatus && (
+              <div className="pt-1">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold ${
+                  dbStatus.isTurso
+                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${dbStatus.isTurso ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                  {dbStatus.isTurso ? 'Turso Cloud DB: Connected (Persistent)' : 'Database: Local SQLite Storage'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Password Form */}
@@ -395,9 +414,21 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
               <span>Administration & Master Control</span>
             </div>
             <h1 className="text-2xl font-black text-white tracking-tight">Suhurupaya Auditorium Portal</h1>
-            <p className="text-xs text-slate-400 mt-1">
-              Live seat inventory management, VIP block controls, and attendee registry
-            </p>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <span className="text-xs text-slate-400">
+                Live seat inventory management, VIP block controls, and attendee registry
+              </span>
+              {dbStatus && (
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  dbStatus.isTurso
+                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${dbStatus.isTurso ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                  {dbStatus.isTurso ? 'Turso Cloud: Connected (Persistent)' : 'Local SQLite Storage'}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

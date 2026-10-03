@@ -111,8 +111,30 @@ async function getAuditoriumStats() {
 }
 
 // -------------------------------------------------------------
-// Public Endpoints
-// -------------------------------------------------------------
+// 0. Health & Database Connection Diagnostic Check
+app.get('/api/health', async (req, res) => {
+  const isTurso = Boolean(process.env.TURSO_DATABASE_URL && process.env.TURSO_DATABASE_URL.startsWith('libsql://'));
+  try {
+    const totalRow = await db.get('SELECT count(*) as count FROM seats');
+    res.json({
+      success: true,
+      status: 'OK',
+      databaseType: isTurso ? 'Turso Cloud Database (libSQL)' : 'Local SQLite Fallback',
+      isTurso,
+      tursoHost: isTurso ? process.env.TURSO_DATABASE_URL.split('@').pop()?.split('/')[0] : null,
+      seatsCount: totalRow ? Number(totalRow.count) : 0,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      status: 'ERROR',
+      databaseType: isTurso ? 'Turso Cloud' : 'Local SQLite',
+      isTurso,
+      error: err.message
+    });
+  }
+});
 
 // 1. Get all seats and current layout
 app.get('/api/seats', async (req, res) => {
