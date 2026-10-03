@@ -164,7 +164,7 @@ app.post('/api/bookings', async (req, res) => {
     });
   }
 
-  // Strict Rule 1: Max 3 seats limit
+  // Strict Rule 1: Max 3 seats limit per checkout
   if (seatIds.length === 0) {
     return res.status(400).json({ success: false, error: 'Please select at least 1 seat.' });
   }
@@ -175,7 +175,68 @@ app.post('/api/bookings', async (req, res) => {
     });
   }
 
+  // Extract client IP address for anti-fraud detection
+  const rawIp = (
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.headers['x-real-ip'] ||
+    req.socket?.remoteAddress ||
+    req.ip ||
+    ''
+  ).trim();
+  const clientIp = rawIp.replace(/^.*:/, '');
+
+  const cleanNic = nic.trim().toUpperCase();
+  const cleanPhone = phone.trim().replace(/[\s\-\+\(\)]/g, '');
+  const cleanInstRef = institutionRef.trim().toUpperCase();
+
   try {
+    // Strict Rule 2: Multi-attempt cumulative limit check (Max 3 seats total per person)
+    // Block attempts if the same National ID, Attendance Ref, Phone number, or IP has already booked seats
+    const existingBookings = await db.all(`
+      SELECT id, booking_ref, full_name, nic, phone, institution_ref, seat_count, ip_address
+      FROM bookings
+      WHERE (status IS NULL OR status != 'CANCELLED')
+        AND (
+          UPPER(TRIM(nic)) = ?
+          OR UPPER(TRIM(institution_ref)) = ?
+          OR replace(replace(replace(replace(phone, ' ', ''), '-', ''), '+', ''), '(', '') = ?
+          OR (
+            ip_address IS NOT NULL 
+            AND ip_address NOT IN ('', 'unknown', '127.0.0.1', '::1', 'localhost') 
+            AND ip_address = ?
+          )
+        )
+    `, [cleanNic, cleanInstRef, cleanPhone, clientIp]);
+
+    if (existingBookings && existingBookings.length > 0) {
+      let totalAlreadyBooked = 0;
+      const triggers = [];
+
+      for (const b of existingBookings) {
+        totalAlreadyBooked += Number(b.seat_count || 0);
+        if (b.nic && b.nic.trim().toUpperCase() === cleanNic) triggers.push(`NIC: ${cleanNic}`);
+        if (b.institution_ref && b.institution_ref.trim().toUpperCase() === cleanInstRef) triggers.push(`Attendance Ref: ${cleanInstRef}`);
+        const bPhone = (b.phone || '').replace(/[\s\-\+\(\)]/g, '');
+        if (bPhone && bPhone === cleanPhone) triggers.push(`Phone: ${phone.trim()}`);
+        if (clientIp && !['', 'unknown', '127.0.0.1', '::1', 'localhost'].includes(clientIp) && b.ip_address === clientIp) {
+          triggers.push(`Device IP: ${clientIp}`);
+        }
+      }
+
+      const uniqueTriggers = [...new Set(triggers)];
+
+      if (totalAlreadyBooked + seatIds.length > 3) {
+        const remainingAllowed = Math.max(0, 3 - totalAlreadyBooked);
+        const triggerDesc = uniqueTriggers.length > 0 ? ` (${uniqueTriggers.join(', ')})` : '';
+        return res.status(403).json({
+          success: false,
+          error: totalAlreadyBooked >= 3
+            ? `උපරිම ආසන සීමාව ඉක්මවා ඇත: ඔබගේ ${triggerDesc} මගින් දැනටමත් ආසන 3 ක් වෙන්කරවා ගෙන ඇත. එක් අයෙකුට වෙන්කරවා ගත හැකි උපරිම ආසන සංඛ්‍යාව 3 ක් පමණි.`
+            : `ආසන සීමාව ඉක්මවා ඇත: ඔබ දැනටමත් ආසන ${totalAlreadyBooked} ක් වෙන්කරවා ගෙන ඇත${triggerDesc}. ඔබට තවදුරටත් වෙන්කරවා ගත හැක්කේ ආසන ${remainingAllowed} ක් පමණි.`
+        });
+      }
+    }
+
     // Verify all requested seats exist and are AVAILABLE
     const placeholders = seatIds.map(() => '?').join(',');
     const existingSeats = await db.all(`SELECT id, status FROM seats WHERE id IN (${placeholders})`, seatIds);
@@ -239,7 +300,7 @@ app.post('/api/bookings', async (req, res) => {
     // Atomic Batch Transaction
     const batchStatements = [
       {
-        sql: `INSERT INTO bookings (id, booking_ref, full_name, nic, phone, institution_ref, seat_ids, seat_count, ticket_token, seat_tickets) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        sql: `INSERT INTO bookings (id, booking_ref, full_name, nic, phone, institution_ref, seat_ids, seat_count, ticket_token, seat_tickets, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           bookingId,
           bookingRef,
@@ -250,7 +311,8 @@ app.post('/api/bookings', async (req, res) => {
           JSON.stringify(seatIds),
           seatIds.length,
           ticketToken,
-          JSON.stringify(seatTickets)
+          JSON.stringify(seatTickets),
+          clientIp
         ]
       },
       ...seatIds.map(seatId => ({

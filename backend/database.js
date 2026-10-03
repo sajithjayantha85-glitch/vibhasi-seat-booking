@@ -100,6 +100,7 @@ export async function initDatabase() {
       seat_count INTEGER NOT NULL,
       ticket_token TEXT NOT NULL,
       seat_tickets TEXT,
+      ip_address TEXT,
       status TEXT DEFAULT 'CONFIRMED',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -131,6 +132,7 @@ export async function initDatabase() {
   // Ensure migrations for existing DB
   try { await db.exec(`ALTER TABLE check_ins ADD COLUMN seat_id TEXT;`); } catch (e) {}
   try { await db.exec(`ALTER TABLE bookings ADD COLUMN seat_tickets TEXT;`); } catch (e) {}
+  try { await db.exec(`ALTER TABLE bookings ADD COLUMN ip_address TEXT;`); } catch (e) {}
 
   await seedSeatsIfEmpty();
 }

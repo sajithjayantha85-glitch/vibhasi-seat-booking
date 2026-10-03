@@ -24,7 +24,7 @@ export default function BookingModal({
     if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fullName.trim()) {
       setError('Please enter your Full Name.');
@@ -43,7 +43,10 @@ export default function BookingModal({
       return;
     }
 
-    onSubmitBooking(formData);
+    const res = await onSubmitBooking(formData);
+    if (res && !res.success) {
+      setError(res.error);
+    }
   };
 
   return (

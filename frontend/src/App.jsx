@@ -153,11 +153,12 @@ export default function App() {
         setSelectedSeatIds([]);
         setActiveTicket(data.booking);
         loadSeats();
+        return { success: true };
       } else {
-        alert(data.error || 'Failed to complete reservation');
+        return { success: false, error: data.error || 'Failed to complete reservation' };
       }
     } catch (err) {
-      alert('Network error while creating booking: ' + err.message);
+      return { success: false, error: 'Network error while creating booking: ' + err.message };
     } finally {
       setIsSubmitting(false);
     }
