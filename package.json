@@ -5,12 +5,23 @@
   "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "install:all": "npm install --prefix backend && npm install --prefix frontend",
-    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "build": "npm install && npm --prefix frontend install && npm --prefix frontend run build",
     "start": "node backend/server.js",
     "test": "node backend/test_system.js"
   },
-  "keywords": ["seat-booking", "auditorium", "qr-scanner", "vibhasi"],
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "keywords": [
+    "seat-booking",
+    "auditorium",
+    "qr-scanner",
+    "vibhasi"
+  ],
   "author": "Department of Examinations Welfare Association",
   "license": "ISC"
 }
