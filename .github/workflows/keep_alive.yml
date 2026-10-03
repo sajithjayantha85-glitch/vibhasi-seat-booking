@@ -2,14 +2,19 @@ name: Keep Render Awake 24/7
 
 on:
   schedule:
-    # Trigger every 10 minutes to prevent Render free tier from going to sleep
-    - cron: '*/10 * * * *'
+    # Trigger every 5 minutes to prevent Render free tier from sleeping (sleep threshold is 15 min)
+    - cron: '*/5 * * * *'
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Health Endpoint
+      - name: Ping Render Backend & Frontend
         run: |
-          curl -s -f https://vibhasi-seat-booking.onrender.com/api/health || true
+          echo "Pinging Vibhasi Render instance at $(date)..."
+          curl -s -f -m 30 https://vibhasi-seat-booking.onrender.com/api/health || true
+          curl -s -f -m 30 https://vibhasi-seat-booking.onrender.com/ || true
+          echo "Ping completed successfully!"
