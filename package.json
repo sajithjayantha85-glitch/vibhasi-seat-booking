@@ -1,0 +1,16 @@
+{
+  "name": "vibhasi-seat-booking-system",
+  "version": "1.0.0",
+  "description": "\"විභාසි\" Concert Seat Booking, Admin Portal & Live Gate Scanner System",
+  "main": "backend/server.js",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/server.js",
+    "test": "node backend/test_system.js"
+  },
+  "keywords": ["seat-booking", "auditorium", "qr-scanner", "vibhasi"],
+  "author": "Department of Examinations Welfare Association",
+  "license": "ISC"
+}

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: vibhasi-seat-booking
+    env: node
+    plan: free
+    region: singapore # Closest region with low latency to Sri Lanka
+    buildCommand: npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: ADMIN_PASSWORD
+        generateValue: false # Set in Render Dashboard (e.g. vibhasi@2026)
+      - key: TURSO_DATABASE_URL
+        generateValue: false # Set in Render Dashboard (libsql://...)
+      - key: TURSO_AUTH_TOKEN
+        generateValue: false # Set in Render Dashboard
+      - key: TICKET_SECRET_KEY
+        generateValue: true

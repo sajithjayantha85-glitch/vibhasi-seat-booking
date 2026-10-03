@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100;
+    font-family: 'Inter', 'Noto Sans Sinhala', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* ======================================================== */
+/* 3D PERSPECTIVE & CONCERT STAGE ANIMATIONS                */
+/* ======================================================== */
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+.perspective-1200 {
+  perspective: 1200px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* 3D Floating Animation */
+@keyframes float-3d {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotateX(4deg) rotateY(-3deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float-3d 6s ease-in-out infinite;
+}
+
+/* Smooth Tilt on Hover */
+.hover-3d-tilt {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+.hover-3d-tilt:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-3deg) translateY(-4px) scale(1.01);
+}
+
+/* 3D Stage Platform Tilt */
+.stage-platform-3d {
+  transform: perspective(1000px) rotateX(24deg);
+  transform-origin: bottom center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.15);
+}
+
+/* Moving Stage Spotlights */
+@keyframes spotlight-sweep-left {
+  0%, 100% {
+    transform: rotate(-25deg) scaleX(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: rotate(5deg) scaleX(1.15);
+    opacity: 0.75;
+  }
+}
+
+@keyframes spotlight-sweep-right {
+  0%, 100% {
+    transform: rotate(25deg) scaleX(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: rotate(-5deg) scaleX(1.15);
+    opacity: 0.75;
+  }
+}
+
+@keyframes spotlight-center-pulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+}
+
+.animate-spotlight-left {
+  animation: spotlight-sweep-left 7s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.animate-spotlight-right {
+  animation: spotlight-sweep-right 8s ease-in-out infinite reverse;
+  transform-origin: top center;
+}
+
+.animate-spotlight-center {
+  animation: spotlight-center-pulse 4s ease-in-out infinite;
+}
+
+/* Equalizer audio bar pulse */
+@keyframes eq-bounce {
+  0%, 100% { height: 20%; }
+  50% { height: 95%; }
+}
+.animate-eq-1 { animation: eq-bounce 0.9s ease-in-out infinite; }
+.animate-eq-2 { animation: eq-bounce 1.3s ease-in-out infinite 0.2s; }
+.animate-eq-3 { animation: eq-bounce 0.7s ease-in-out infinite 0.4s; }
+.animate-eq-4 { animation: eq-bounce 1.1s ease-in-out infinite 0.1s; }
+.animate-eq-5 { animation: eq-bounce 1.4s ease-in-out infinite 0.3s; }
+
+/* Floating Musical Notes */
+@keyframes music-float-up {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-80px) rotate(20deg) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.animate-music-1 { animation: music-float-up 5s ease-out infinite; }
+.animate-music-2 { animation: music-float-up 6s ease-out infinite 1.8s; }
+.animate-music-3 { animation: music-float-up 5.5s ease-out infinite 3.2s; }
+
+/* QR Scanner Line */
+@keyframes scan-line {
+  0% { transform: translateY(0%); }
+  50% { transform: translateY(100%); }
+  100% { transform: translateY(0%); }
+}
+
+.animate-scan-line {
+  animation: scan-line 2.2s ease-in-out infinite;
+}
+
+/* Subtle Pulse */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+/* Error Shake for Password Field */
+@keyframes shake-error {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.animate-shake-error {
+  animation: shake-error 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Shimmer Light Reflection */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(200%) skewX(-20deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer-sweep 3.5s infinite ease-in-out;
+}
