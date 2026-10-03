@@ -13,16 +13,16 @@ export default function Navbar({ activeTab, setActiveTab, selectedSeatsCount, is
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white">
-                "විභාසි" (Vibhasi)
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-base sm:text-lg tracking-tight text-white">
+                VIBHASI 2026
               </span>
-              <span className="hidden sm:inline-block px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/20">
-                ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය
+              <span className="hidden sm:inline-block px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold rounded-full border border-emerald-500/20">
+                Dept. of Examinations Welfare Society
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 -mt-0.5">
-              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය • ආසන වෙන්කිරීමේ නිල පද්ධතිය
+            <p className="text-[11px] text-slate-400 -mt-0.5">
+              Suhurupaya 19th Floor Auditorium • Official Seat Reservation
             </p>
           </div>
         </div>

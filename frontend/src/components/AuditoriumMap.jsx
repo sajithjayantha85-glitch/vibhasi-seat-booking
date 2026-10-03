@@ -384,7 +384,7 @@ export default function AuditoriumMap({
               textAnchor="middle"
               className="fill-cyan-400 font-black tracking-widest text-sm font-sans"
             >
-              "විභාසි" සජීවී ප්‍රසංගය 2026
+              "VIBHASI" LIVE CONCERT 2026
             </text>
             <text
               x="575"
@@ -392,7 +392,7 @@ export default function AuditoriumMap({
               textAnchor="middle"
               className="fill-amber-300 font-extrabold tracking-wider text-[11px] font-mono"
             >
-              LIVE CONCERT STAGE (17m × 4m-6m)
+              MAIN STAGE (17m × 4m-6m)
             </text>
             <text x="575" y="16" textAnchor="middle" className="fill-slate-400 text-xs font-mono font-bold">
               ◄── 17 m MAIN AUDITORIUM STAGE ──►
@@ -401,11 +401,11 @@ export default function AuditoriumMap({
 
           {/* Block Section Headers */}
           <g className="section-labels" transform="translate(0, 230)">
-            <text x="340" y="0" textAnchor="middle" className="fill-slate-400 font-semibold text-xs tracking-wider">
-              LEFT BLOCK (වම් කොටස)
+            <text x="340" y="0" textAnchor="middle" className="fill-slate-400 font-bold text-xs tracking-wider">
+              LEFT BLOCK
             </text>
-            <text x="810" y="0" textAnchor="middle" className="fill-slate-400 font-semibold text-xs tracking-wider">
-              RIGHT BLOCK (දකුණු කොටස)
+            <text x="810" y="0" textAnchor="middle" className="fill-slate-400 font-bold text-xs tracking-wider">
+              RIGHT BLOCK
             </text>
             {/* Central Aisle Guide Line */}
             <line
@@ -631,9 +631,9 @@ export default function AuditoriumMap({
               }`}
             >
               {hoveredSeat.status === 'CHECKED_IN'
-                ? 'Checked In (ශාලාවේ අසුන්ගෙන ඇත)'
+                ? 'Checked In (Admitted)'
                 : hoveredSeat.status === 'BOOKED'
-                ? 'Reserved (පැමිණීමට නියමිතයි)'
+                ? 'Reserved'
                 : hoveredSeat.status}
             </span>
           </div>
@@ -664,11 +664,11 @@ export default function AuditoriumMap({
           <Info className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
             {isLiveMonitor
-              ? 'සජීවී ශාලා පිරීයාම් නිරීක්ෂකය: QR කේතය ස්කෑන් කර ඇතුල්වන විට අදාළ ආසන නිල් පැහැයෙන් දැල්වේ.'
+              ? 'Live Hall Fill Monitor: Seats illuminate in blue as guests check in at the gate.'
               : isAdmin
-              ? 'Admin Mode: Click any seat to toggle VIP Block/Unblock, or click row letters (A-DD).'
+              ? 'Admin Mode: Click any seat to toggle VIP Block/Unblock, or click row letters.'
               : selectedSeatIds.length > 0
-              ? 'Seats selected! Click the button to the right to complete reservation.'
+              ? 'Seats selected! Click the button to the right to complete your free booking.'
               : 'Click any available green seat to select. Maximum 3 seats per booking.'}
           </span>
         </div>
@@ -683,7 +683,7 @@ export default function AuditoriumMap({
               onClick={onProceedBooking}
               className="py-1.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/30 transition-all animate-pulse transform active:scale-95"
             >
-              <span>ඉදිරියට යන්න (Book Now)</span>
+              <span>Book Selected Seats</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}

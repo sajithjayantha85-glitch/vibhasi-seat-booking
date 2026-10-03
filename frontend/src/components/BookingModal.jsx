@@ -39,7 +39,7 @@ export default function BookingModal({
       return;
     }
     if (!formData.institutionRef.trim()) {
-      setError('Please enter your Institution Arrival / Reference Number (ආයතනයේ පැමිණීමේ අංකය).');
+      setError('Please enter your Institution Arrival / Reference Number.');
       return;
     }
 
@@ -59,11 +59,11 @@ export default function BookingModal({
           </button>
           <div className="flex items-center gap-2 text-emerald-200 text-xs font-semibold tracking-wider uppercase mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය</span>
+            <span>Dept. of Examinations Welfare Society</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">"විභාසි" (Vibhasi) ප්‍රසංගය</h2>
+          <h2 className="text-2xl font-bold tracking-tight">"VIBHASI" Musical Concert 2026</h2>
           <p className="text-emerald-100 text-xs mt-1">
-            සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය • නොමිලේ ආසන වෙන්කිරීම (Free Admission Pass)
+            Suhurupaya 19th Floor Auditorium • Free Admission Pass Reservation
           </p>
         </div>
 
@@ -96,9 +96,9 @@ export default function BookingModal({
 
           {/* Full Name */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Full Name / සම්පූර්ණ නම *</span>
+              <span>Full Name *</span>
             </label>
             <input
               type="text"
@@ -113,9 +113,9 @@ export default function BookingModal({
 
           {/* NIC / Passport */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
               <IdCard className="w-3.5 h-3.5 text-emerald-400" />
-              <span>National ID Number (NIC / Passport) / ජා.හැ. අංකය *</span>
+              <span>National ID Number (NIC / Passport) *</span>
             </label>
             <input
               type="text"
@@ -130,9 +130,9 @@ export default function BookingModal({
 
           {/* Mobile Phone */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Mobile Phone Number / දුරකථන අංකය *</span>
+              <span>Mobile Phone Number *</span>
             </label>
             <input
               type="tel"
@@ -147,9 +147,9 @@ export default function BookingModal({
 
           {/* Institution Arrival / Reference Number */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Institution Arrival / Reference Number (ආයතනයේ පැමිණීමේ අංකය) *</span>
+              <span>Institution Arrival / Reference Number *</span>
             </label>
             <input
               type="text"

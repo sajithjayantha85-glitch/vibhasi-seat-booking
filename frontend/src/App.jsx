@@ -177,44 +177,57 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 pb-24">
         {activeTab === 'BOOKING' && (
-          <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-            {/* Compact Mobile-Friendly Concert Header */}
-            <div className="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div>
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold mb-0.5">
-                    <Music className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය</span>
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                    <span>"විභාසි" (Vibhasi) ප්‍රසංගය 2026</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-full font-bold">
-                      LIVE
+          <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
+            {/* Elegant Modern Concert Header Card */}
+            <div className="bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-emerald-500/10 via-teal-500/5 to-transparent pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+                      <Music className="w-3.5 h-3.5 text-emerald-400" />
+                      Dept. of Examinations Welfare Society
                     </span>
+                    <span className="text-[11px] font-mono font-bold text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                      LIVE RESERVATION
+                    </span>
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    "VIBHASI" Annual Musical Concert 2026
                   </h1>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-300 mt-1">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      බත්තරමුල්ල සුහුරුපාය 19 වන මහල
+
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-300 pt-1">
+                    <span className="flex items-center gap-1.5 text-slate-300">
+                      <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                      19th Floor Auditorium, Suhurupaya, Battaramulla
                     </span>
                     <span className="text-slate-600 hidden sm:inline">•</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      2026 ඔක්තෝබර් 05 (සඳුදා) ප.ව. 05:00
+                    <span className="flex items-center gap-1.5 text-slate-300">
+                      <Calendar className="w-4 h-4 text-emerald-400 shrink-0" />
+                      Monday, October 05, 2026 at 5:00 PM
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-xl text-xs text-emerald-300 self-start sm:self-center font-medium">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>නොමිලේ ප්‍රවේශය • උපරිම ආසන 3ක් තෝරන්න</span>
+                <div className="flex flex-wrap items-center gap-3 self-start lg:self-center">
+                  <div className="bg-slate-950/80 border border-emerald-500/30 rounded-2xl px-4 py-2.5 text-center shadow-lg">
+                    <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold block">Admission</span>
+                    <span className="text-base font-extrabold text-white">100% Free</span>
+                  </div>
+                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl px-4 py-2.5 text-center shadow-lg">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Booking Limit</span>
+                    <span className="text-base font-mono font-bold text-amber-300">Max 3 Seats</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Interactive Seating Layout */}
+            {/* Interactive Seating Layout Section */}
             <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
                 <div>
                   <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                     <Ticket className="w-5 h-5 text-emerald-400" />
@@ -225,48 +238,14 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
-                  <span>Available: <strong className="text-emerald-400">{stats.available}</strong></span>
-                  <span>•</span>
-                  <span>Reserved: <strong className="text-rose-400">{stats.booked}</strong></span>
-                  <span>•</span>
-                  <span>VIP Locked: <strong className="text-slate-400">{stats.blocked}</strong></span>
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-900/90 px-3.5 py-2 rounded-2xl border border-slate-800 shadow-sm">
+                  <span>Available: <strong className="text-emerald-400 font-bold">{stats.available}</strong></span>
+                  <span className="text-slate-600">•</span>
+                  <span>Reserved: <strong className="text-rose-400 font-bold">{stats.booked}</strong></span>
+                  <span className="text-slate-600">•</span>
+                  <span>VIP Locked: <strong className="text-slate-400 font-bold">{stats.blocked}</strong></span>
                 </div>
               </div>
-
-              {/* Prominent Selection Banner when user selects seats */}
-              {selectedSeatIds.length > 0 && (
-                <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl shadow-emerald-500/20 animate-fadeIn">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shrink-0">
-                      <Ticket className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-white flex flex-wrap items-center gap-2">
-                        <span>ඔබ ආසන {selectedSeatIds.length} ක් තෝරාගෙන ඇත:</span>
-                        <div className="flex flex-wrap gap-1">
-                          {selectedSeatIds.map(id => (
-                            <span key={id} className="text-xs font-mono font-extrabold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">
-                              {id}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-xs text-emerald-200 mt-0.5">
-                        නොමිලේ ඩිජිටල් ප්‍රවේශ පත්‍රය (Free E-Ticket) ලබා ගැනීමට ඉදිරියට යන්න බොත්තම ඔබන්න.
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setIsBookingModalOpen(true)}
-                    className="py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black rounded-2xl text-sm shadow-xl flex items-center justify-center gap-2 transition-transform transform active:scale-95 shrink-0"
-                  >
-                    <span>ඉදිරියට යන්න (Continue to Book)</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
 
               <AuditoriumMap
                 seats={seats}
@@ -355,18 +334,16 @@ export default function App() {
               Maximum Seat Limit Reached!
             </h3>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              To ensure fair access for everyone, booking is strictly limited to a{' '}
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              To ensure fair access for all guests, reservations are strictly limited to a{' '}
               <strong className="text-amber-400">maximum of 3 seats per attendee</strong>.
-              <br /><br />
-              (එක් අයදුම්කරුවෙකුට වෙන්කරවා ගත හැකි උපරිම ආසන සංඛ්‍යාව ආසන 3 කි).
             </p>
 
             <button
               onClick={() => setShowMaxLimitModal(false)}
-              className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+              className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl text-xs sm:text-sm transition-colors shadow-lg shadow-amber-500/20"
             >
-              Understood / තේරුම් ගත්තා
+              I Understand
             </button>
           </div>
         </div>

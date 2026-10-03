@@ -98,15 +98,15 @@ export default function ETicketModal({ ticketData, onClose }) {
     const nicNumber = pass.nic || ticketData.nic || 'N/A';
     const attnNumber = pass.institutionRef || ticketData.institutionRef || 'N/A';
     const text = encodeURIComponent(
-      `🏛️ *"විභාසි" (Vibhasi) ප්‍රසංගය - ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය*\n\n` +
-      `🎟️ *ආසන අංකය (Seat Number):* ${seatId}\n` +
-      `👤 *නම (Attendee Name):* ${pass.fullName || ticketData.fullName}\n` +
-      `🪪 *හැඳුනුම්පත් අංකය (ID / NIC):* ${nicNumber}\n` +
-      `📋 *පැමිණීමේ අංකය (Attendance No):* ${attnNumber}\n` +
-      `📍 *ස්ථානය (Venue):* සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය, බත්තරමුල්ල\n` +
-      `📅 *දිනය & වේලාව:* 2026 ඔක්තෝබර් 05 සඳුදා (ප.ව. 05:00)\n` +
+      `🏛️ *"VIBHASI" Musical Concert 2026 - Dept. of Examinations Welfare Society*\n\n` +
+      `🎟️ *Seat Number:* ${seatId}\n` +
+      `👤 *Attendee Name:* ${pass.fullName || ticketData.fullName}\n` +
+      `🪪 *National ID (NIC):* ${nicNumber}\n` +
+      `📋 *Attendance Ref:* ${attnNumber}\n` +
+      `📍 *Venue:* 19th Floor Auditorium, Suhurupaya, Battaramulla\n` +
+      `📅 *Date & Time:* Monday, 05 October 2026 at 05:00 PM\n` +
       `🔖 *Pass Reference:* ${pass.seatRef || `${ticketData.bookingRef}-${seatId}`}\n\n` +
-      `කරුණාකර දොරටුවේදී මෙම විස්තර සහ QR කේතය ඉදිරිපත් කරන්න.`
+      `Please present this e-ticket pass and QR code at the entrance gate for verification.`
     );
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
@@ -302,17 +302,17 @@ export default function ETicketModal({ ticketData, onClose }) {
             <div className="absolute -right-9 -bottom-3.5 w-7 h-7 rounded-full bg-slate-950 border-l border-slate-700"></div>
 
             <div className="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full text-[11px] font-semibold tracking-wider uppercase mb-1">
-              Free Admission Pass • නිල ආසන ප්‍රවේශපත්‍රය
+              Free Admission Pass • Official E-Ticket
             </div>
             <p className="text-[11px] text-emerald-400 font-semibold mb-0.5">
-              ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය ඉදිරිපත් කරන
+              Dept. of Examinations Welfare Society Presents
             </p>
             <h3 className="text-xl font-black tracking-tight text-white">
-              "විභාසි" (Vibhasi) ප්‍රසංගය
+              "VIBHASI" Musical Concert 2026
             </h3>
             <p className="text-xs text-slate-400 mt-1 flex items-center justify-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-              <span>බත්තරමුල්ල සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය</span>
+              <span>19th Floor Auditorium, Suhurupaya, Battaramulla</span>
             </p>
           </div>
 
@@ -323,7 +323,7 @@ export default function ETicketModal({ ticketData, onClose }) {
               <div className="space-y-0.5">
                 <span className="text-[10px] text-sky-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-                  <span>හැඳුනුම්පත් අංකය (ID NO)</span>
+                  <span>NATIONAL ID (NIC)</span>
                 </span>
                 <span className="font-mono font-black text-sm text-white tracking-wide block">
                   {currentPass.nic || ticketData.nic}
@@ -332,7 +332,7 @@ export default function ETicketModal({ ticketData, onClose }) {
               <div className="space-y-0.5 border-l border-slate-800 pl-3">
                 <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <Ticket className="w-3.5 h-3.5 text-amber-400" />
-                  <span>පැමිණීමේ අංකය (ATTENDANCE)</span>
+                  <span>ATTENDANCE REF</span>
                 </span>
                 <span className="font-mono font-black text-sm text-amber-300 tracking-wide block">
                   {currentPass.institutionRef || ticketData.institutionRef}
@@ -342,12 +342,12 @@ export default function ETicketModal({ ticketData, onClose }) {
 
             <div className="grid grid-cols-2 gap-2 px-1">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Attendee Name (නම)</span>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Attendee Name</span>
                 <span className="font-bold text-slate-100 text-sm truncate block">{currentPass.fullName || ticketData.fullName}</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Date & Time</span>
-                <span className="font-medium text-slate-200 block">05 Oct 2026 (සඳුදා) • 05:00 PM</span>
+                <span className="font-medium text-slate-200 block">Monday, 05 Oct 2026 • 05:00 PM</span>
               </div>
             </div>
 
@@ -355,7 +355,7 @@ export default function ETicketModal({ ticketData, onClose }) {
             <div className="p-3 bg-slate-950/90 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
               <div>
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                  මෙම ප්‍රවේශපත්‍රයේ ආසනය (This Seat Pass)
+                  Designated Seat Pass
                 </span>
                 <div className="text-lg font-mono font-black text-emerald-400 flex items-center gap-1.5 mt-0.5">
                   <Ticket className="w-5 h-5 text-emerald-400" />
@@ -420,11 +420,11 @@ export default function ETicketModal({ ticketData, onClose }) {
               className="mt-1 py-1.5 px-3.5 bg-emerald-950/80 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors"
             >
               <Send className="w-3 h-3 text-emerald-400" />
-              <span>Seat {currentSeatId} ප්‍රවේශපත්‍රය මිතුරාට WhatsApp කරන්න</span>
+              <span>Share Seat {currentSeatId} Pass via WhatsApp</span>
             </button>
 
             <p className="text-[10px] text-slate-400 max-w-xs leading-relaxed mt-2.5">
-              මෙම එක් එක් QR කේතය අදාළ ආසනය සඳහා පමණක් වෙන වෙනම වලංගු වේ. මිතුරන් වෙනස් වේලාවන්හිදී පැමිණියද ස්වාධීනව ඇතුල් විය හැක.
+              Each seat ticket has a unique verifiable QR code valid for one attendee admission only.
             </p>
           </div>
         </div>
