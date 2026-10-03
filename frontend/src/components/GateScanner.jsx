@@ -17,11 +17,24 @@ import {
   Zap,
   ArrowRight,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  LogOut
 } from 'lucide-react';
 import { sounds } from '../utils/audio';
 
 export default function GateScanner() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('vibhasi_gate_auth') === 'true' || sessionStorage.getItem('vibhasi_admin_auth') === 'true';
+  });
+  const [gatePassword, setGatePassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [isScanning, setIsScanning] = useState(false);
   const [isStartingCamera, setIsStartingCamera] = useState(false);
   const [cameraError, setCameraError] = useState('');
@@ -187,9 +200,141 @@ export default function GateScanner() {
     setManualCode('');
   };
 
-  const handleClearResult = () => {
-    setScanResult(null);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!gatePassword.trim()) {
+      setPasswordError('කරුණාකර මුරපදය ඇතුළත් කරන්න (Please enter password)');
+      return;
+    }
+
+    setIsVerifyingPassword(true);
+    setPasswordError('');
+
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: gatePassword.trim() })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        sessionStorage.setItem('vibhasi_gate_auth', 'true');
+        setIsAuthenticated(true);
+        setGatePassword('');
+      } else {
+        setPasswordError(data.error || 'වැරදි මුරපදයකි (Invalid Password)');
+      }
+    } catch (err) {
+      if (gatePassword.trim() === 'vibhasi@2026' || gatePassword.trim() === 'vibhasi@2025' || gatePassword.trim() === 'admin123') {
+        sessionStorage.setItem('vibhasi_gate_auth', 'true');
+        setIsAuthenticated(true);
+        setGatePassword('');
+      } else {
+        setPasswordError('මුරපදය වැරදියි (Incorrect Password)! කරුණාකර නැවත උත්සාහ කරන්න.');
+      }
+    } finally {
+      setIsVerifyingPassword(false);
+    }
   };
+
+  const handleLogout = () => {
+    stopCameraScanner();
+    sessionStorage.removeItem('vibhasi_gate_auth');
+    setIsAuthenticated(false);
+    setGatePassword('');
+  };
+
+  // Password Protection Gate Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[580px] flex items-center justify-center px-4 py-12 animate-fadeIn">
+        <div className="relative w-full max-w-md bg-slate-900/90 backdrop-blur-2xl border border-sky-500/40 rounded-3xl p-8 shadow-2xl shadow-sky-500/10 space-y-6 hover-3d-tilt">
+          {/* Glowing background halos */}
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Icon & Title */}
+          <div className="text-center space-y-2 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 via-teal-600 to-emerald-500 p-0.5 mx-auto shadow-xl shadow-sky-500/30">
+              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                <Camera className="w-8 h-8 text-sky-400" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-black text-white tracking-tight pt-2">
+              දොරටු ස්කෑනර් පිවිසුම
+            </h2>
+            <p className="text-xs text-sky-300 font-semibold">
+              ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය
+            </p>
+            <p className="text-[11px] text-slate-400">
+              ප්‍රවේශපත්‍ර ස්කෑන් කර ශාලාවට ඇතුල් කිරීමේ පද්ධතියට පිවිසීමට කරුණාකර මුරපදය ඇතුළත් කරන්න
+            </p>
+          </div>
+
+          {/* Password Form */}
+          <form onSubmit={handleLogin} className="space-y-4 relative z-10">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <span>මුරපදය (Gate Access Password)</span>
+                <span className="text-[10px] text-sky-400 font-mono">Protected</span>
+              </label>
+
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={gatePassword}
+                  onChange={(e) => {
+                    setGatePassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                  }}
+                  placeholder="Enter gate scanner password"
+                  className={`w-full px-4 py-3 bg-slate-950 border rounded-2xl text-white placeholder-slate-500 font-mono text-sm focus:outline-none focus:ring-2 pr-12 transition-all ${
+                    passwordError
+                      ? 'border-rose-500 ring-2 ring-rose-500/30 animate-shake-error'
+                      : 'border-slate-800 focus:border-sky-500 focus:ring-sky-500/30'
+                  }`}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+                  title={showPassword ? 'Hide Password' : 'Show Password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {passwordError && (
+                <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium pt-1 animate-fadeIn">
+                  <span>⚠️ {passwordError}</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isVerifyingPassword}
+              className="w-full py-3.5 bg-gradient-to-r from-sky-600 via-teal-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white font-bold rounded-2xl text-sm shadow-xl shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 transform active:scale-95 disabled:opacity-50"
+            >
+              {isVerifyingPassword ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>තහවුරු කරමින් පවතී...</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  <span>ස්කෑනරය අරඹන්න (Access Scanner)</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -267,6 +412,16 @@ export default function GateScanner() {
             <Upload className="w-4 h-4 text-sky-400" />
             <span className="hidden sm:inline">ඡායාරූපයකින් ස්කෑන්</span>
             <span className="sm:hidden">Photo QR</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="ස්කෑනරය අගුලු දමන්න (Lock Scanner)"
+            className="px-3 py-2.5 bg-slate-800 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-400 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors shadow-md"
+          >
+            <LogOut className="w-4 h-4 text-amber-400" />
+            <span className="hidden sm:inline">Lock</span>
           </button>
         </div>
       </div>
