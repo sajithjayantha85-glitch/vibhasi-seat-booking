@@ -25,6 +25,7 @@ import {
   KeyRound
 } from 'lucide-react';
 import AuditoriumMap from './AuditoriumMap';
+import ETicketModal from './ETicketModal';
 
 export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -43,6 +44,7 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
   const [rowBulkSelect, setRowBulkSelect] = useState({ rowLabel: 'A', blockSide: 'ALL', action: 'BLOCK' });
   const [actionMessage, setActionMessage] = useState('');
   const [dbStatus, setDbStatus] = useState(null);
+  const [selectedTicketForModal, setSelectedTicketForModal] = useState(null);
 
   // Fetch attendees list and database health status
   useEffect(() => {
@@ -694,13 +696,34 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
                       )}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => handleCancelBooking(att.id, att.full_name)}
-                        className="p-1 hover:bg-rose-950/60 rounded text-rose-400 hover:text-rose-300 transition-colors"
-                        title="Cancel reservation & release seats"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTicketForModal({
+                            bookingRef: att.booking_ref,
+                            fullName: att.full_name,
+                            nic: att.nic,
+                            phone: att.phone,
+                            institutionRef: att.institution_ref,
+                            seats: att.seat_ids,
+                            seatTickets: att.seat_tickets,
+                            ticketToken: att.ticket_token
+                          })}
+                          className="px-2.5 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-500/60 rounded-xl transition-all flex items-center gap-1 text-[11px] font-bold shadow-sm"
+                          title="View, Print, Download or WhatsApp QR Pass"
+                        >
+                          <Ticket className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>QR Pass</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCancelBooking(att.id, att.full_name)}
+                          className="p-1.5 hover:bg-rose-950/60 rounded-xl text-rose-400 hover:text-rose-300 transition-colors"
+                          title="Cancel reservation & release seats"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -709,6 +732,14 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
           </table>
         </div>
       </div>
+
+      {/* Re-Issue / Print / QR Modal for Admin */}
+      {selectedTicketForModal && (
+        <ETicketModal
+          ticketData={selectedTicketForModal}
+          onClose={() => setSelectedTicketForModal(null)}
+        />
+      )}
     </div>
   );
 }

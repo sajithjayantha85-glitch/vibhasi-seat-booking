@@ -896,6 +896,7 @@ app.get('/api/admin/attendees', async (req, res) => {
         b.seat_ids,
         b.seat_count,
         b.ticket_token,
+        b.seat_tickets,
         b.status as booking_status,
         b.created_at,
         c.checked_in_at,
@@ -908,7 +909,8 @@ app.get('/api/admin/attendees', async (req, res) => {
 
     const formatted = attendees.map(a => ({
       ...a,
-      seat_ids: JSON.parse(a.seat_ids)
+      seat_ids: JSON.parse(a.seat_ids || '[]'),
+      seat_tickets: a.seat_tickets ? JSON.parse(a.seat_tickets) : []
     }));
 
     const stats = await getAuditoriumStats();
