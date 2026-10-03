@@ -47,6 +47,14 @@ export default function GateScanner() {
 
   const fileInputRef = useRef(null);
   const html5QrCodeRef = useRef(null);
+  const lastScannedPayloadRef = useRef('');
+  const lastScannedTimeRef = useRef(0);
+
+  const handleClearResult = () => {
+    setScanResult(null);
+    lastScannedPayloadRef.current = '';
+    lastScannedTimeRef.current = 0;
+  };
 
   // Fetch recent scans on mount
   useEffect(() => {
@@ -173,6 +181,17 @@ export default function GateScanner() {
 
   const handleVerifyPayload = async (payload, targetSeatId = null) => {
     if (!payload || isVerifying) return;
+
+    const cleanPayload = String(payload).trim();
+    if (!cleanPayload) return;
+
+    // Prevent immediate re-scan loop while same QR is held in camera frame
+    if (cleanPayload === lastScannedPayloadRef.current && (Date.now() - lastScannedTimeRef.current < 4000)) {
+      return;
+    }
+    lastScannedPayloadRef.current = cleanPayload;
+    lastScannedTimeRef.current = Date.now();
+
     setIsVerifying(true);
 
     try {
@@ -698,17 +717,23 @@ export default function GateScanner() {
                         </div>
                       )}
                       <div className="font-mono text-rose-100 text-xs pl-5">
-                        {new Date(scanResult.guest.checkedInAt).toLocaleTimeString()} (
-                        {new Date(scanResult.guest.checkedInAt).toLocaleDateString()})
+                        {scanResult.guest?.checkedInAt
+                          ? `${new Date(scanResult.guest.checkedInAt).toLocaleTimeString()} (${new Date(scanResult.guest.checkedInAt).toLocaleDateString()})`
+                          : new Date().toLocaleTimeString()}
                       </div>
                       <div className="text-[10px] text-rose-300 pl-5">
-                        Scanned at: {scanResult.guest.gateOfficer || 'Main Gate'}
+                        Scanned at: {scanResult.guest?.gateOfficer || 'Main Gate'}
                       </div>
                     </div>
                   ) : (
                     <div className="text-[11px] text-emerald-300/80 flex items-center gap-1.5 pt-1">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Admitted at: {new Date(scanResult.guest.checkedInAt).toLocaleTimeString()}</span>
+                      <span>
+                        Admitted at:{' '}
+                        {scanResult.guest?.checkedInAt
+                          ? new Date(scanResult.guest.checkedInAt).toLocaleTimeString()
+                          : new Date().toLocaleTimeString()}
+                      </span>
                     </div>
                   )}
                 </div>

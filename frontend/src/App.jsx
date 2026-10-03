@@ -95,7 +95,9 @@ export default function App() {
       // Add to live entrance feed
       setRecentCheckIns(prev => [
         {
-          id: crypto.randomUUID(),
+          id: (typeof crypto !== 'undefined' && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
           guest_name: payload.guestName,
           nic: payload.nic,
           institution_ref: payload.institutionRef,
