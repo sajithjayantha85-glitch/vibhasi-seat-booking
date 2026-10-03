@@ -284,7 +284,7 @@ export default function GateScanner() {
               දොරටු ස්කෑනර් පිවිසුම
             </h2>
             <p className="text-xs text-sky-300 font-semibold">
-              ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය
+              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය
             </p>
             <p className="text-[11px] text-slate-400">
               ප්‍රවේශපත්‍ර ස්කෑන් කර ශාලාවට ඇතුල් කිරීමේ පද්ධතියට පිවිසීමට කරුණාකර මුරපදය ඇතුළත් කරන්න

@@ -342,7 +342,7 @@ app.post('/api/bookings', async (req, res) => {
         venue: 'බත්තරමුල්ල සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය (Suhurupaya Auditorium, 19th Floor, Battaramulla)',
         date: '2026-10-05',
         time: '05:00 PM',
-        eventName: 'ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය ඉදිරිපත් කරන "විභාසි" (Vibhasi) ප්‍රසංගය'
+        eventName: '"විභාසි" (Vibhasi) ප්‍රසංගය 2026 - සුහුරුපාය ශ්‍රවණාගාරය'
       }
     });
   } catch (err) {
@@ -423,7 +423,7 @@ app.get('/api/ticket/:ref', async (req, res) => {
         venue: 'බත්තරමුල්ල සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය (Suhurupaya Auditorium, 19th Floor, Battaramulla)',
         date: '2026-10-05',
         time: '05:00 PM',
-        eventName: 'ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය ඉදිරිපත් කරන "විභාසි" (Vibhasi) ප්‍රසංගය'
+        eventName: '"විභාසි" (Vibhasi) ප්‍රසංගය 2026 - සුහුරුපාය ශ්‍රවණාගාරය'
       }
     });
   } catch (err) {

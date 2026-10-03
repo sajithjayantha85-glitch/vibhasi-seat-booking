@@ -323,7 +323,7 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
               පරිපාලක පිවිසුම
             </h2>
             <p className="text-xs text-indigo-300 font-semibold">
-              ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය
+              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය
             </p>
             <p className="text-[11px] text-slate-400">
               ආසන පාලනය හා නිල වාර්තා ලබාගැනීමට කරුණාකර මුරපදය ඇතුළත් කරන්න

@@ -62,7 +62,7 @@ export default function BookingModal({
           </button>
           <div className="flex items-center gap-2 text-emerald-200 text-xs font-semibold tracking-wider uppercase mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>Dept. of Examinations Welfare Society</span>
+            <span>Auditorium Seat Reservation</span>
           </div>
           <h2 className="text-2xl font-bold tracking-tight">"VIBHASI" Musical Concert 2026</h2>
           <p className="text-emerald-100 text-xs mt-1">

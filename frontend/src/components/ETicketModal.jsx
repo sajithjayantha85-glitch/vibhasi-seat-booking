@@ -98,7 +98,7 @@ export default function ETicketModal({ ticketData, onClose }) {
     const nicNumber = pass.nic || ticketData.nic || 'N/A';
     const attnNumber = pass.institutionRef || ticketData.institutionRef || 'N/A';
     const text = encodeURIComponent(
-      `🏛️ *"VIBHASI" Musical Concert 2026 - Dept. of Examinations Welfare Society*\n\n` +
+      `🏛️ *"VIBHASI" Musical Concert 2026*\n\n` +
       `🎟️ *Seat Number:* ${seatId}\n` +
       `👤 *Attendee Name:* ${pass.fullName || ticketData.fullName}\n` +
       `🪪 *National ID (NIC):* ${nicNumber}\n` +
@@ -128,9 +128,9 @@ export default function ETicketModal({ ticketData, onClose }) {
     doc.text('SUHURUPAYA 19TH FLOOR AUDITORIUM', 74, 11, { align: 'center' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text('DEPT. OF EXAMINATIONS WELFARE ASSOCIATION', 74, 17, { align: 'center' });
+    doc.text('OFFICIAL CONCERT ADMISSION PASS', 74, 17, { align: 'center' });
     doc.setFontSize(7.5);
-    doc.text(`OFFICIAL CONCERT PASS • SEAT PASS ${index + 1} OF ${total}`, 74, 23, { align: 'center' });
+    doc.text(`SEAT PASS ${index + 1} OF ${total}`, 74, 23, { align: 'center' });
 
     // Event Title Box
     doc.setFillColor(30, 41, 59); // slate-800
@@ -142,7 +142,7 @@ export default function ETicketModal({ ticketData, onClose }) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(203, 213, 225);
-    doc.text('Presented by Welfare Association, Dept. of Examinations', 74, 49, { align: 'center' });
+    doc.text('Official Admission Pass • 19th Floor Auditorium', 74, 49, { align: 'center' });
 
     // Attendee & Seat Details Box
     doc.setFillColor(30, 41, 59);
@@ -305,7 +305,7 @@ export default function ETicketModal({ ticketData, onClose }) {
               Free Admission Pass • Official E-Ticket
             </div>
             <p className="text-[11px] text-emerald-400 font-semibold mb-0.5">
-              Dept. of Examinations Welfare Society Presents
+              Official Digital Admission Pass
             </p>
             <h3 className="text-xl font-black tracking-tight text-white">
               "VIBHASI" Musical Concert 2026
