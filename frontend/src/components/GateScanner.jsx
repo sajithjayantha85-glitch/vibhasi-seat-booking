@@ -93,16 +93,61 @@ export default function GateScanner() {
         aspectRatio: 1.0
       };
 
-      await qrCode.start(
-        { facingMode: front ? 'user' : 'environment' },
-        config,
-        (decodedText) => {
-          if (decodedText) {
-            handleVerifyPayload(decodedText);
-          }
-        },
-        () => {}
-      );
+      const onScanSuccess = (decodedText) => {
+        if (decodedText) {
+          handleVerifyPayload(decodedText);
+        }
+      };
+
+      let started = false;
+
+      // 1. Try with ideal facing mode (avoids throwing OverconstrainedError on laptop webcams)
+      try {
+        await qrCode.start(
+          { facingMode: front ? 'user' : { ideal: 'environment' } },
+          config,
+          onScanSuccess,
+          () => {}
+        );
+        started = true;
+      } catch (err1) {
+        console.warn('Ideal facingMode camera start failed, attempting front/user webcam fallback:', err1);
+      }
+
+      // 2. Fallback: Try front user-facing camera (default for all laptops and webcams)
+      if (!started) {
+        try {
+          await qrCode.start(
+            { facingMode: 'user' },
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          started = true;
+          setUseFrontCamera(true);
+        } catch (err2) {
+          console.warn('User facingMode start failed, attempting direct deviceId enumeration:', err2);
+        }
+      }
+
+      // 3. Fallback: Enumerate available cameras and start with the first detected device ID
+      if (!started) {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length > 0) {
+          const selectedCam = front
+            ? (cameras.find(c => c.label.toLowerCase().includes('front') || c.label.toLowerCase().includes('user')) || cameras[0])
+            : (cameras.find(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('rear') || c.label.toLowerCase().includes('environment')) || cameras[0]);
+          await qrCode.start(
+            selectedCam.id,
+            config,
+            onScanSuccess,
+            () => {}
+          );
+          started = true;
+        } else {
+          throw new Error('මෙම උපාංගයේ කිසිදු කැමරාවක් හඳුනාගත නොහැකි විය (No camera hardware found)');
+        }
+      }
     } catch (err) {
       console.error('Failed to start camera scanner:', err);
       setIsScanning(false);
