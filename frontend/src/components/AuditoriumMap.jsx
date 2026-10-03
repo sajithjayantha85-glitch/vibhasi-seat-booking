@@ -193,58 +193,58 @@ export default function AuditoriumMap({
   };
 
   return (
-    <div className="relative w-full h-[650px] sm:h-[750px] bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col select-none">
+    <div className="relative w-full h-[540px] sm:h-[650px] lg:h-[750px] bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col select-none">
       {/* Floating Control Bar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/60 shadow-lg text-slate-300">
+      <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 sm:gap-1.5 bg-slate-950/85 backdrop-blur-md px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-700/60 shadow-lg text-slate-300">
         <button
           onClick={handleZoomIn}
-          className="control-button p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
+          className="control-button p-1 sm:p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
           title="Zoom In"
         >
-          <ZoomIn className="w-5 h-5" />
+          <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
         <button
           onClick={handleZoomOut}
-          className="control-button p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
+          className="control-button p-1 sm:p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
           title="Zoom Out"
         >
-          <ZoomOut className="w-5 h-5" />
+          <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
         <button
           onClick={handleResetView}
-          className="control-button p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
+          className="control-button p-1 sm:p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-200 hover:text-white"
           title="Reset View"
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
-        <span className="text-xs font-mono px-2 py-1 bg-slate-800 rounded text-slate-400">
+        <span className="text-[10px] sm:text-xs font-mono px-1.5 py-0.5 bg-slate-800 rounded text-slate-400">
           {Math.round(zoom * 100)}%
         </span>
       </div>
 
       {/* Legend Header */}
-      <div className="absolute top-4 right-4 z-20 flex flex-wrap items-center gap-2.5 bg-slate-950/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/60 shadow-lg text-xs font-medium">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
+      <div className="absolute top-2.5 right-2.5 z-20 flex flex-wrap items-center gap-1.5 sm:gap-2.5 bg-slate-950/90 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-slate-700/60 shadow-lg text-[10px] sm:text-xs font-medium">
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
           <span className="text-slate-200">Available</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50"></span>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50"></span>
           <span className="text-slate-200">Selected</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded bg-rose-500 shadow-sm shadow-rose-500/50"></span>
-          <span className="text-slate-200">Booked (Awaiting)</span>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-rose-500 shadow-sm shadow-rose-500/50"></span>
+          <span className="text-slate-200">Booked</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded bg-sky-500 border border-sky-300 shadow-sm shadow-sky-500/50 flex items-center justify-center text-[9px] text-white font-bold">✓</span>
-          <span className="text-sky-300 font-semibold">Checked In (ශාලාවේ)</span>
+        <div className="hidden sm:flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-sky-500 border border-sky-300 shadow-sm shadow-sky-500/50 flex items-center justify-center text-[8px] text-white font-bold">✓</span>
+          <span className="text-sky-300 font-semibold">Checked In</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded bg-slate-600 shadow-sm flex items-center justify-center text-[9px] text-white">
-            <Lock className="w-2.5 h-2.5" />
+        <div className="hidden sm:flex items-center gap-1">
+          <span className="w-3 h-3 rounded bg-slate-600 shadow-sm flex items-center justify-center text-[8px] text-white">
+            <Lock className="w-2 h-2" />
           </span>
-          <span className="text-slate-400">VIP / Blocked</span>
+          <span className="text-slate-400">VIP</span>
         </div>
       </div>
 
