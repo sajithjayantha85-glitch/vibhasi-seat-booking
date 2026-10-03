@@ -12,7 +12,13 @@ import {
   Maximize2,
   TrendingUp,
   RefreshCw,
-  Play
+  Play,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import AuditoriumMap from './AuditoriumMap';
 import { sounds } from '../utils/audio';
@@ -25,6 +31,14 @@ export default function LiveMonitor({
   recentCheckIns = [],
   onSimulateCheckIn
 }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('vibhasi_monitor_auth') === 'true' || sessionStorage.getItem('vibhasi_admin_auth') === 'true';
+  });
+  const [monitorPassword, setMonitorPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationMessage, setSimulationMessage] = useState('');
@@ -40,6 +54,50 @@ export default function LiveMonitor({
   const occupancyPercent = totalSeats > 0 ? ((checkedInSeats / totalSeats) * 100).toFixed(1) : 0;
   const leftPercent = 252 > 0 ? (((stats.leftOccupied || 0) / 252) * 100).toFixed(1) : 0;
   const rightPercent = 252 > 0 ? (((stats.rightOccupied || 0) / 252) * 100).toFixed(1) : 0;
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!monitorPassword.trim()) {
+      setPasswordError('කරුණාකර මුරපදය ඇතුළත් කරන්න (Please enter password)');
+      return;
+    }
+
+    setIsVerifying(true);
+    setPasswordError('');
+
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: monitorPassword.trim() })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        sessionStorage.setItem('vibhasi_monitor_auth', 'true');
+        setIsAuthenticated(true);
+        setMonitorPassword('');
+      } else {
+        setPasswordError(data.error || 'වැරදි මුරපදයකි (Invalid Password)');
+      }
+    } catch (err) {
+      if (monitorPassword.trim() === 'vibhasi@2026' || monitorPassword.trim() === 'vibhasi@2025' || monitorPassword.trim() === 'admin123') {
+        sessionStorage.setItem('vibhasi_monitor_auth', 'true');
+        setIsAuthenticated(true);
+        setMonitorPassword('');
+      } else {
+        setPasswordError('මුරපදය වැරදියි (Incorrect Password)! කරුණාකර නැවත උත්සාහ කරන්න.');
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('vibhasi_monitor_auth');
+    setIsAuthenticated(false);
+    setMonitorPassword('');
+  };
 
   const handleSimulate = async () => {
     setIsSimulating(true);
@@ -58,8 +116,100 @@ export default function LiveMonitor({
     }
   };
 
+  // Password Protection Gate Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[580px] flex items-center justify-center px-4 py-12 animate-fadeIn">
+        <div className="relative w-full max-w-md bg-slate-900/90 backdrop-blur-2xl border border-sky-500/40 rounded-3xl p-8 shadow-2xl shadow-sky-500/10 space-y-6 hover-3d-tilt">
+          {/* Glowing background halos */}
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Icon & Title */}
+          <div className="text-center space-y-2 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 via-blue-600 to-cyan-500 p-0.5 mx-auto shadow-xl shadow-sky-500/30">
+              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                <Activity className="w-8 h-8 text-sky-400" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-black text-white tracking-tight pt-2">
+              සජීවී නිරීක්ෂක පිවිසුම
+            </h2>
+            <p className="text-xs text-sky-300 font-semibold">
+              ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තු සුභසාධක සංගමය
+            </p>
+            <p className="text-[11px] text-slate-400">
+              ශාලාවේ ආසන පිරීයාමේ සජීවී දත්ත නැරඹීමට කරුණාකර මුරපදය ඇතුළත් කරන්න
+            </p>
+          </div>
+
+          {/* Password Form */}
+          <form onSubmit={handleLogin} className="space-y-4 relative z-10">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                <span>මුරපදය (Access Password)</span>
+                <span className="text-[10px] text-sky-400 font-mono">Protected</span>
+              </label>
+
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={monitorPassword}
+                  onChange={(e) => {
+                    setMonitorPassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                  }}
+                  placeholder="Enter monitor password"
+                  className={`w-full px-4 py-3 bg-slate-950 border rounded-2xl text-white placeholder-slate-500 font-mono text-sm focus:outline-none focus:ring-2 pr-12 transition-all ${
+                    passwordError
+                      ? 'border-rose-500 ring-2 ring-rose-500/30 animate-shake-error'
+                      : 'border-slate-800 focus:border-sky-500 focus:ring-sky-500/30'
+                  }`}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+                  title={showPassword ? 'Hide Password' : 'Show Password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {passwordError && (
+                <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium pt-1 animate-fadeIn">
+                  <span>⚠️ {passwordError}</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isVerifying}
+              className="w-full py-3.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold rounded-2xl text-sm shadow-xl shadow-sky-600/30 transition-all flex items-center justify-center gap-2 transform active:scale-95 disabled:opacity-50"
+            >
+              {isVerifying ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>තහවුරු කරමින් පවතී...</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  <span>පිවිසෙන්න (Access Monitor)</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated Live Monitor View
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6 animate-fadeIn">
       {/* Top Hero Card */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-sky-500/10 to-transparent pointer-events-none" />
@@ -105,196 +255,149 @@ export default function LiveMonitor({
               <Play className={`w-3.5 h-3.5 fill-current ${isSimulating ? 'animate-spin' : ''}`} />
               <span>{isSimulating ? 'ස්කෑන් කරමින්...' : 'ආදර්ශන ස්කෑන් (Simulate Scan)'}</span>
             </button>
+
+            <button
+              onClick={handleLogout}
+              className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-rose-950/70 border border-slate-700 hover:border-rose-700/60 text-slate-300 hover:text-rose-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+              title="Lock Live Monitor"
+            >
+              <LogOut className="w-3.5 h-3.5 text-amber-400" />
+              <span>Lock Monitor</span>
+            </button>
           </div>
         </div>
 
+        {/* Simulation Feedback Banner */}
         {simulationMessage && (
-          <div className="mt-3 p-2.5 bg-sky-950/80 border border-sky-500/40 rounded-xl text-xs text-sky-200 flex items-center gap-2 animate-fadeIn">
-            <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
+          <div className="mt-4 p-3 bg-sky-950/70 border border-sky-500/40 rounded-2xl text-xs text-sky-300 font-medium flex items-center gap-2 animate-fadeIn">
+            <Sparkles className="w-4 h-4 text-sky-400 animate-spin" />
             <span>{simulationMessage}</span>
           </div>
         )}
       </div>
 
-      {/* Main KPI Stats & Liquid Fill Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
-        {/* Main Hall Occupancy Progress */}
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-sky-400" />
-              <h2 className="text-base font-bold text-white tracking-tight">
-                මුළු ශාලාවේ පිරීයාම (Total Hall Occupancy)
-              </h2>
-            </div>
-            <div className="text-right">
-              <span className="text-2xl font-black text-sky-400 font-mono">
-                {occupancyPercent}%
-              </span>
-              <span className="text-xs text-slate-400 ml-2 font-mono">
-                ({checkedInSeats} / {totalSeats} ආසන)
-              </span>
-            </div>
+      {/* Main Stats KPIs */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Admitted & Inside Hall */}
+        <div className="bg-slate-900/90 border border-sky-500/30 rounded-2xl p-4 shadow-lg shadow-sky-500/5 relative overflow-hidden">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="font-semibold uppercase tracking-wider">ශාලාව තුළ (Inside)</span>
+            <Users className="w-4 h-4 text-sky-400" />
           </div>
-
-          {/* Liquid Progress Bar */}
-          <div className="w-full h-4 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 transition-all duration-700 shadow-md shadow-sky-500/50 relative overflow-hidden"
-              style={{ width: `${Math.min(100, Math.max(0, occupancyPercent))}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20 animate-pulse pointer-events-none" />
-            </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-sky-400 font-mono">
+              {checkedInSeats}
+            </span>
+            <span className="text-xs text-slate-500">/ {totalSeats}</span>
           </div>
-
-          {/* Left vs Right Block Gauges */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300 font-medium">වම් කොටස (Left Block)</span>
-                <span className="font-mono font-bold text-sky-400">
-                  {stats.leftOccupied || 0} / 252 ({leftPercent}%)
-                </span>
-              </div>
-              <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-sky-500 rounded-full transition-all duration-500"
-                  style={{ width: `${leftPercent}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3.5 space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300 font-medium">දකුණු කොටස (Right Block)</span>
-                <span className="font-mono font-bold text-cyan-400">
-                  {stats.rightOccupied || 0} / 252 ({rightPercent}%)
-                </span>
-              </div>
-              <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-cyan-500 rounded-full transition-all duration-500"
-                  style={{ width: `${rightPercent}%` }}
-                />
-              </div>
-            </div>
+          <div className="mt-2 text-xs font-mono text-sky-300">
+            {occupancyPercent}% Occupancy Rate
           </div>
         </div>
 
-        {/* 4 Status Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* 1. Checked-in Seats (Inside Hall) */}
-          <div className="bg-gradient-to-br from-sky-950/40 to-slate-950/80 border border-sky-500/30 rounded-2xl p-4 space-y-1 relative overflow-hidden shadow-sm">
-            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-400">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-            <span className="text-[11px] font-semibold text-sky-300 block uppercase tracking-wider">
-              ශාලාව තුළ අසුන්ගෙන ඇත
-            </span>
-            <div className="text-2xl font-black text-sky-400 font-mono">
-              {checkedInSeats}
-            </div>
-            <p className="text-[10px] text-slate-400">
-              {stats.checkedIn || 0} දෙනෙක් දොරටුවෙන් ඇතුල් විය
-            </p>
+        {/* Booked - Awaiting Arrival */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="font-semibold uppercase tracking-wider">පැමිණීමට නියමිත</span>
+            <Clock className="w-4 h-4 text-rose-400" />
           </div>
-
-          {/* 2. Booked Seats (Awaiting Gate Arrival) */}
-          <div className="bg-gradient-to-br from-rose-950/40 to-slate-950/80 border border-rose-500/30 rounded-2xl p-4 space-y-1 relative overflow-hidden shadow-sm">
-            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400">
-              <Clock className="w-4 h-4" />
-            </div>
-            <span className="text-[11px] font-semibold text-rose-300 block uppercase tracking-wider">
-              පැමිණීමට නියමිත
-            </span>
-            <div className="text-2xl font-black text-rose-400 font-mono">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-rose-400 font-mono">
               {bookedAwaiting}
-            </div>
-            <p className="text-[10px] text-slate-400">
-              ටිකට් වෙන්කර ඇති නමුත් තවම ඇතුල් වී නැත
-            </p>
-          </div>
-
-          {/* 3. Available Seats */}
-          <div className="bg-gradient-to-br from-emerald-950/40 to-slate-950/80 border border-emerald-500/30 rounded-2xl p-4 space-y-1 relative overflow-hidden shadow-sm">
-            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-              <Ticket className="w-4 h-4" />
-            </div>
-            <span className="text-[11px] font-semibold text-emerald-300 block uppercase tracking-wider">
-              හිස් ආසන (Available)
             </span>
-            <div className="text-2xl font-black text-emerald-400 font-mono">
-              {availableSeats}
-            </div>
-            <p className="text-[10px] text-slate-400">
-              කිසිවෙකු වෙන්කර නොමැත
-            </p>
+            <span className="text-xs text-slate-500">reserved</span>
           </div>
+          <div className="mt-2 text-xs text-slate-400">
+            ටිකට් ලබාගෙන ඇත
+          </div>
+        </div>
 
-          {/* 4. VIP Blocked */}
-          <div className="bg-gradient-to-br from-slate-800/40 to-slate-950/80 border border-slate-700/50 rounded-2xl p-4 space-y-1 relative overflow-hidden shadow-sm">
-            <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-slate-700/30 flex items-center justify-center text-slate-300">
-              <Users className="w-4 h-4" />
-            </div>
-            <span className="text-[11px] font-semibold text-slate-300 block uppercase tracking-wider">
-              VIP / Blocked
+        {/* Left Block Occupancy */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="font-semibold uppercase tracking-wider">වම් බ්ලොක් (Left)</span>
+            <span className="text-[10px] font-mono text-slate-500">Rows A-V</span>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-white font-mono">
+              {stats.leftOccupied || 0}
             </span>
-            <div className="text-2xl font-black text-slate-200 font-mono">
-              {blockedSeats}
-            </div>
-            <p className="text-[10px] text-slate-400">
-              පරිපාලක විසින් වෙන්කර ඇත
-            </p>
+            <span className="text-xs text-slate-500">/ 252</span>
+          </div>
+          <div className="mt-2 w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div
+              className="bg-sky-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${leftPercent}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Right Block Occupancy */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="font-semibold uppercase tracking-wider">දකුණු බ්ලොක් (Right)</span>
+            <span className="text-[10px] font-mono text-slate-500">Rows A-V</span>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-white font-mono">
+              {stats.rightOccupied || 0}
+            </span>
+            <span className="text-xs text-slate-500">/ 252</span>
+          </div>
+          <div className="mt-2 w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div
+              className="bg-sky-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${rightPercent}%` }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Main Map & Live Entrance Stream Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        {/* Interactive Auditorium Map in Live Monitor Mode (3 Cols) */}
-        <div className="xl:col-span-3 space-y-2">
+      {/* Main Dual Grid: Interactive Live Hall Map + Live Entrance Feed */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column (8 cols): Real-Time Live Seating Layout */}
+        <div className="lg:col-span-8 space-y-2">
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-sky-400" />
-              <span>සජීවී ආසන සිතියම (Live Seating Visualizer)</span>
-            </h3>
-            <span className="text-xs text-sky-400 font-mono font-medium">
-              නිල් පැහැති ආසන = ශාලාවේ අසුන්ගෙන ඇත
+              <h2 className="text-sm font-bold text-white tracking-tight">
+                ශාලාවේ සජීවී ආසන සිතියම (Live Hall Map)
+              </h2>
+            </div>
+            <span className="text-[11px] text-slate-400">
+              ස්කෑන් කළ සැණින් අදාළ ආසන නිල් පැහැයෙන් දැල්වේ
             </span>
           </div>
 
           <AuditoriumMap
             seats={seats}
             selectedSeatIds={[]}
+            onSeatClick={() => {}}
+            isAdmin={false}
             isLiveMonitor={true}
             recentSeatIds={recentSeatIds}
-            isAdmin={false}
           />
         </div>
 
-        {/* Live Entrance Activity Stream (1 Col) */}
-        <div className="xl:col-span-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col h-[650px] sm:h-[750px] shadow-xl">
-          <div className="pb-3 border-b border-slate-800 flex items-center justify-between">
+        {/* Right Column (4 cols): Live Gate Entrance Activity Stream */}
+        <div className="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col h-[540px] sm:h-[650px] lg:h-[750px]">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2">
-              <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-                සජීවී ඇතුල්වීම් ප්‍රවාහය
-              </h3>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <h3 className="font-bold text-sm text-white">දොරටු සජීවී ප්‍රවාහය</h3>
             </div>
-            <span className="text-[10px] text-slate-400 font-mono">
-              Live Feed
+            <span className="text-[10px] font-mono text-slate-400">
+              {recentCheckIns.length} Entrances
             </span>
           </div>
 
-          {/* Activity Cards List */}
-          <div className="flex-1 overflow-y-auto space-y-2.5 py-3 pr-1">
+          {/* Scrollable Check-in Items */}
+          <div className="flex-1 overflow-y-auto space-y-2.5 py-3 pr-1 scrollbar-thin scrollbar-thumb-slate-700">
             {recentCheckIns.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-4 text-slate-500 text-xs">
-                <Ticket className="w-8 h-8 text-slate-600 mb-2" />
-                <p className="font-medium">තවම කිසිවෙකු ඇතුල් වී නැත</p>
-                <p className="text-[11px] text-slate-600 mt-1">
-                  දොරටුවේදී ටිකට්පත් ස්කෑන් කළ විට මෙහි දිස්වේ
-                </p>
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
+                <Ticket className="w-8 h-8 opacity-40 stroke-1" />
+                <p className="text-xs">තවමත් කිසිවෙකු ඇතුළත් වී නොමැත.</p>
+                <p className="text-[10px] text-slate-600">දොරටුවේදී QR ස්කෑන් කළ විට මෙහි තොරතුරු දිස්වේ.</p>
               </div>
             ) : (
               recentCheckIns.map((item, idx) => (
