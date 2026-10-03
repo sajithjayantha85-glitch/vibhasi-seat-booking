@@ -28,8 +28,7 @@ export default function GateScanner() {
   const [scanResult, setScanResult] = useState(null); // { valid, isDuplicate, guest, message, error }
   const [manualCode, setManualCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [cameras, setCameras] = useState([]);
-  const [selectedCameraId, setSelectedCameraId] = useState(null);
+  const [useFrontCamera, setUseFrontCamera] = useState(false);
   const [recentScans, setRecentScans] = useState([]);
   const [stats, setStats] = useState({ checkedInToday: 0 });
 
@@ -39,6 +38,9 @@ export default function GateScanner() {
   // Fetch recent scans on mount
   useEffect(() => {
     fetchRecentScans();
+    return () => {
+      stopCameraScanner();
+    };
   }, []);
 
   const fetchRecentScans = async () => {
@@ -54,88 +56,40 @@ export default function GateScanner() {
     }
   };
 
-  // Discover available cameras
-  useEffect(() => {
-    Html5Qrcode.getCameras()
-      .then((devices) => {
-        if (devices && devices.length) {
-          setCameras(devices);
-          // Prefer environment / back camera
-          const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear'));
-          setSelectedCameraId(backCam ? backCam.id : devices[0].id);
-        }
-      })
-      .catch((err) => {
-        console.warn('Camera detection error (may need permission):', err);
-      });
-
-    return () => {
-      stopCameraScanner();
-    };
-  }, []);
-
-  const startCameraScanner = async (overrideCamId = null) => {
+  const startCameraScanner = async (front = useFrontCamera) => {
     setCameraError('');
     setIsStartingCamera(true);
 
     try {
       if (html5QrCodeRef.current) {
         try {
-          if (html5QrCodeRef.current.isScanning) {
-            await html5QrCodeRef.current.stop();
-          }
+          await html5QrCodeRef.current.stop();
           html5QrCodeRef.current.clear();
         } catch (e) {}
       }
 
       setIsScanning(true);
-      // Let the DOM update so viewport is rendered
-      await new Promise(r => setTimeout(r, 120));
+      await new Promise(r => setTimeout(r, 100));
 
       const qrCode = new Html5Qrcode('qr-reader-viewport');
       html5QrCodeRef.current = qrCode;
 
-      const cam = overrideCamId || selectedCameraId || { facingMode: 'environment' };
-
       const config = {
         fps: 10,
-        qrbox: { width: 240, height: 240 },
+        qrbox: { width: 250, height: 250 },
         aspectRatio: 1.0
       };
 
       await qrCode.start(
-        cam,
+        { facingMode: front ? 'user' : 'environment' },
         config,
         (decodedText) => {
-          handleVerifyPayload(decodedText);
-          if (html5QrCodeRef.current) {
-            try {
-              html5QrCodeRef.current.pause(true);
-              setTimeout(() => {
-                try {
-                  if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-                    html5QrCodeRef.current.resume();
-                  }
-                } catch (e) {}
-              }, 2500);
-            } catch (e) {}
+          if (decodedText) {
+            handleVerifyPayload(decodedText);
           }
         },
         () => {}
       );
-
-      // Refresh camera devices list once permission is granted
-      try {
-        const devices = await Html5Qrcode.getCameras();
-        if (devices && devices.length > 0) {
-          setCameras(devices);
-          if (!selectedCameraId) {
-            const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear'));
-            setSelectedCameraId(backCam ? backCam.id : devices[0].id);
-          }
-        }
-      } catch (e) {}
-
     } catch (err) {
       console.error('Failed to start camera scanner:', err);
       setIsScanning(false);
@@ -149,16 +103,20 @@ export default function GateScanner() {
     }
   };
 
+  const toggleCameraFacing = async () => {
+    const nextFacing = !useFrontCamera;
+    setUseFrontCamera(nextFacing);
+    if (isScanning) {
+      await startCameraScanner(nextFacing);
+    }
+  };
+
   const stopCameraScanner = async () => {
     if (html5QrCodeRef.current) {
       try {
-        if (html5QrCodeRef.current.isScanning) {
-          await html5QrCodeRef.current.stop();
-        }
+        await html5QrCodeRef.current.stop();
         html5QrCodeRef.current.clear();
-      } catch (err) {
-        console.error('Failed to stop camera:', err);
-      }
+      } catch (err) {}
     }
     setIsScanning(false);
   };
@@ -279,6 +237,18 @@ export default function GateScanner() {
             )}
           </button>
 
+          {isScanning && (
+            <button
+              type="button"
+              onClick={toggleCameraFacing}
+              className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 hover:text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors shadow-md"
+              title="Flip between front and rear camera"
+            >
+              <FlipHorizontal className="w-4 h-4 text-emerald-400" />
+              <span>Flip</span>
+            </button>
+          )}
+
           {/* Quick Photo / Image Upload Fallback */}
           <input
             type="file"
@@ -349,24 +319,6 @@ export default function GateScanner() {
                 <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
                   ඉහත <strong>Start Camera Scanner</strong> ඔබා කැමරාව සක්‍රීය කරන්න. (නැතහොත් <strong>ඡායාරූපයකින් ස්කෑන්</strong> ඔබා QR කේතයේ ඡායාරූපයක් ගන්න).
                 </p>
-                {cameras.length > 1 && (
-                  <div className="pt-2">
-                    <select
-                      value={selectedCameraId || ''}
-                      onChange={(e) => {
-                        setSelectedCameraId(e.target.value);
-                        if (isScanning) startCameraScanner(e.target.value);
-                      }}
-                      className="text-xs bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-300 focus:outline-none"
-                    >
-                      {cameras.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.label || `Camera ${c.id.substring(0, 5)}`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
               </div>
             )}
 
