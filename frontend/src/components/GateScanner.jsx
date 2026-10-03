@@ -284,7 +284,7 @@ export default function GateScanner() {
               දොරටු ස්කෑනර් පිවිසුම
             </h2>
             <p className="text-xs text-sky-300 font-semibold">
-              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය
+              Department of Examinations, Sri Lanka
             </p>
             <p className="text-[11px] text-slate-400">
               ප්‍රවේශපත්‍ර ස්කෑන් කර ශාලාවට ඇතුල් කිරීමේ පද්ධතියට පිවිසීමට කරුණාකර මුරපදය ඇතුළත් කරන්න
@@ -606,7 +606,7 @@ export default function GateScanner() {
                     </div>
                     <div className="border-l border-white/10 pl-3">
                       <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
-                        📋 Attendance Ref
+                        📋 Arrival Number
                       </span>
                       <span className="font-mono font-black text-sm text-amber-300 block mt-0.5">
                         {scanResult.guest.institutionRef}

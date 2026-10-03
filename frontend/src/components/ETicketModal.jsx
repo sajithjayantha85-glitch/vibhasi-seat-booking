@@ -98,11 +98,11 @@ export default function ETicketModal({ ticketData, onClose }) {
     const nicNumber = pass.nic || ticketData.nic || 'N/A';
     const attnNumber = pass.institutionRef || ticketData.institutionRef || 'N/A';
     const text = encodeURIComponent(
-      `🏛️ *"VIBHASI" Musical Concert 2026*\n\n` +
+      `🏛️ *"VIBHASI" Musical Concert 2026 - Department of Examinations, Sri Lanka*\n\n` +
       `🎟️ *Seat Number:* ${seatId}\n` +
       `👤 *Attendee Name:* ${pass.fullName || ticketData.fullName}\n` +
       `🪪 *National ID (NIC):* ${nicNumber}\n` +
-      `📋 *Attendance Ref:* ${attnNumber}\n` +
+      `📋 *Institution Arrival Number:* ${attnNumber}\n` +
       `📍 *Venue:* 19th Floor Auditorium, Suhurupaya, Battaramulla\n` +
       `📅 *Date & Time:* Monday, 05 October 2026 at 05:00 PM\n` +
       `🔖 *Pass Reference:* ${pass.seatRef || `${ticketData.bookingRef}-${seatId}`}\n\n` +
@@ -128,9 +128,9 @@ export default function ETicketModal({ ticketData, onClose }) {
     doc.text('SUHURUPAYA 19TH FLOOR AUDITORIUM', 74, 11, { align: 'center' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text('OFFICIAL CONCERT ADMISSION PASS', 74, 17, { align: 'center' });
+    doc.text('DEPARTMENT OF EXAMINATIONS, SRI LANKA', 74, 17, { align: 'center' });
     doc.setFontSize(7.5);
-    doc.text(`SEAT PASS ${index + 1} OF ${total}`, 74, 23, { align: 'center' });
+    doc.text(`OFFICIAL CONCERT PASS • SEAT PASS ${index + 1} OF ${total}`, 74, 23, { align: 'center' });
 
     // Event Title Box
     doc.setFillColor(30, 41, 59); // slate-800
@@ -142,7 +142,7 @@ export default function ETicketModal({ ticketData, onClose }) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(203, 213, 225);
-    doc.text('Official Admission Pass • 19th Floor Auditorium', 74, 49, { align: 'center' });
+    doc.text('Department of Examinations, Sri Lanka', 74, 49, { align: 'center' });
 
     // Attendee & Seat Details Box
     doc.setFillColor(30, 41, 59);
@@ -164,7 +164,7 @@ export default function ETicketModal({ ticketData, onClose }) {
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(148, 163, 184);
-    doc.text('ATTENDANCE NO (REF):', 18, 85);
+    doc.text('INSTITUTION ARRIVAL NO:', 18, 85);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(245, 158, 11); // amber-400
     doc.text(String(pass.institutionRef || ticketData.institutionRef || ''), 60, 85);
@@ -196,7 +196,7 @@ export default function ETicketModal({ ticketData, onClose }) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7.5);
       doc.setTextColor(203, 213, 225);
-      doc.text(`ID: ${pass.nic || ticketData.nic}   |   ATTENDANCE: ${pass.institutionRef || ticketData.institutionRef}`, 74, 180, { align: 'center' });
+      doc.text(`ID: ${pass.nic || ticketData.nic}   |   ARRIVAL NO: ${pass.institutionRef || ticketData.institutionRef}`, 74, 180, { align: 'center' });
     }
 
     // Security Notice
@@ -305,7 +305,7 @@ export default function ETicketModal({ ticketData, onClose }) {
               Free Admission Pass • Official E-Ticket
             </div>
             <p className="text-[11px] text-emerald-400 font-semibold mb-0.5">
-              Official Digital Admission Pass
+              Department of Examinations, Sri Lanka
             </p>
             <h3 className="text-xl font-black tracking-tight text-white">
               "VIBHASI" Musical Concert 2026
@@ -332,7 +332,7 @@ export default function ETicketModal({ ticketData, onClose }) {
               <div className="space-y-0.5 border-l border-slate-800 pl-3">
                 <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
                   <Ticket className="w-3.5 h-3.5 text-amber-400" />
-                  <span>ATTENDANCE REF</span>
+                  <span>ARRIVAL NUMBER</span>
                 </span>
                 <span className="font-mono font-black text-sm text-amber-300 tracking-wide block">
                   {currentPass.institutionRef || ticketData.institutionRef}

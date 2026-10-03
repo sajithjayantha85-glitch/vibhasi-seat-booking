@@ -30,20 +30,28 @@ export default function BookingModal({
       setError('Please enter your Full Name.');
       return;
     }
-    if (!formData.nic.trim()) {
-      setError('Please enter your National ID Number (NIC / Passport).');
+    const cleanNic = formData.nic.trim().toUpperCase().replace(/[^0-9VX]/g, '');
+    const isOldNic = /^\d{9}[VX]$/.test(cleanNic);
+    const isNewNic = /^\d{12}$/.test(cleanNic);
+    if (!isOldNic && !isNewNic) {
+      setError('Please enter a valid National ID Number (NIC: 9 digits + V/X or 12 digits).');
       return;
     }
     if (!formData.phone.trim()) {
       setError('Please enter your Mobile Phone Number.');
       return;
     }
-    if (!formData.institutionRef.trim()) {
-      setError('Please enter your Institution Arrival / Reference Number.');
+    const cleanInstRef = formData.institutionRef.trim();
+    if (!/^\d{4}$/.test(cleanInstRef)) {
+      setError('Institution Arrival number must be exactly 4 digits (e.g. 1234).');
       return;
     }
 
-    const res = await onSubmitBooking(formData);
+    const res = await onSubmitBooking({
+      ...formData,
+      nic: cleanNic,
+      institutionRef: cleanInstRef
+    });
     if (res && !res.success) {
       setError(res.error);
     }
@@ -62,7 +70,7 @@ export default function BookingModal({
           </button>
           <div className="flex items-center gap-2 text-emerald-200 text-xs font-semibold tracking-wider uppercase mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>Auditorium Seat Reservation</span>
+            <span>Department of Examinations, Sri Lanka</span>
           </div>
           <h2 className="text-2xl font-bold tracking-tight">"VIBHASI" Musical Concert 2026</h2>
           <p className="text-emerald-100 text-xs mt-1">
@@ -148,20 +156,29 @@ export default function BookingModal({
             />
           </div>
 
-          {/* Institution Arrival / Reference Number */}
+          {/* Institution Arrival Number */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Institution Arrival / Reference Number *</span>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Institution Arrival number *</span>
+              </span>
+              <span className="text-[11px] text-emerald-400 font-normal">(4 digits)</span>
             </label>
             <input
               type="text"
               name="institutionRef"
               required
+              maxLength={4}
+              inputMode="numeric"
+              pattern="\d{4}"
               value={formData.institutionRef}
-              onChange={handleChange}
-              placeholder="e.g. DOE-REF-2026-0841"
-              className="w-full px-4 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-mono transition-all"
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                handleChange({ target: { name: 'institutionRef', value: val } });
+              }}
+              placeholder="e.g. 1234"
+              className="w-full px-4 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-mono tracking-widest transition-all"
             />
           </div>
 

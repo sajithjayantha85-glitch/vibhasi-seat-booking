@@ -18,7 +18,7 @@ export default function Navbar({ activeTab, setActiveTab, selectedSeatsCount, is
                 VIBHASI 2026
               </span>
               <span className="hidden sm:inline-block px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold rounded-full border border-emerald-500/20">
-                Annual Musical Concert
+                Department of Examinations, Sri Lanka
               </span>
             </div>
             <p className="text-[11px] text-slate-400 -mt-0.5">

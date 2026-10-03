@@ -188,7 +188,7 @@ export default function App() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
                       <Music className="w-3.5 h-3.5 text-emerald-400" />
-                      Official Seat Reservation Portal
+                      Department of Examinations, Sri Lanka
                     </span>
                     <span className="text-[11px] font-mono font-bold text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />

@@ -323,7 +323,7 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
               පරිපාලක පිවිසුම
             </h2>
             <p className="text-xs text-indigo-300 font-semibold">
-              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය
+              Department of Examinations, Sri Lanka
             </p>
             <p className="text-[11px] text-slate-400">
               ආසන පාලනය හා නිල වාර්තා ලබාගැනීමට කරුණාකර මුරපදය ඇතුළත් කරන්න
@@ -644,7 +644,7 @@ export default function AdminPortal({ seats = [], stats = {}, onRefreshSeats }) 
                 <th className="py-3 px-4">Guest Name</th>
                 <th className="py-3 px-4">NIC / Passport</th>
                 <th className="py-3 px-4">Phone Number</th>
-                <th className="py-3 px-4">Institution Ref #</th>
+                <th className="py-3 px-4">Institution Arrival No</th>
                 <th className="py-3 px-4">Assigned Seats</th>
                 <th className="py-3 px-4">Gate Status</th>
                 <th className="py-3 px-4 text-right">Actions</th>

@@ -136,7 +136,7 @@ export default function LiveMonitor({
               සජීවී නිරීක්ෂක පිවිසුම
             </h2>
             <p className="text-xs text-sky-300 font-semibold">
-              සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය
+              Department of Examinations, Sri Lanka
             </p>
             <p className="text-[11px] text-slate-400">
               ශාලාවේ ආසන පිරීයාමේ සජීවී දත්ත නැරඹීමට කරුණාකර මුරපදය ඇතුළත් කරන්න

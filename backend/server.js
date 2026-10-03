@@ -12,6 +12,41 @@ import { generateTicketToken, verifyTicketToken } from './cryptoUtils.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Sri Lankan National Identity Card (NIC) Normalization
+ * Supports both:
+ * 1. Old NIC format: 9 digits followed by V or X (e.g. 851234567V)
+ * 2. New NIC format: 12 digits (e.g. 198512304567)
+ * Both formats represent the exact same person and map to each other 1-to-1.
+ */
+function getNicVariants(rawNic) {
+  if (!rawNic) return [];
+  const clean = String(rawNic).trim().toUpperCase().replace(/[^0-9VX]/g, '');
+  if (!clean) return [];
+  const variants = new Set([clean]);
+
+  // Format 1: 9 digits + [V/X] -> map to 12 digits
+  // Pattern: YY DDD SSSS [V/X] => 19 + YY + DDD + 0 + SSSS
+  const oldMatch = clean.match(/^(\d{2})(\d{3})(\d{4})[VX]$/);
+  if (oldMatch) {
+    const [, yy, ddd, ssss] = oldMatch;
+    variants.add(`19${yy}${ddd}0${ssss}`);
+    variants.add(`${yy}${ddd}${ssss}V`);
+    variants.add(`${yy}${ddd}${ssss}X`);
+  }
+
+  // Format 2: 12 digits starting with 19 -> map to 9 digits + V/X
+  // Pattern: 19 YY DDD 0 SSSS => YY + DDD + SSSS + V/X
+  const newMatch = clean.match(/^19(\d{2})(\d{3})0(\d{4})$/);
+  if (newMatch) {
+    const [, yy, ddd, ssss] = newMatch;
+    variants.add(`${yy}${ddd}${ssss}V`);
+    variants.add(`${yy}${ddd}${ssss}X`);
+  }
+
+  return Array.from(variants);
+}
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -185,19 +220,41 @@ app.post('/api/bookings', async (req, res) => {
   ).trim();
   const clientIp = rawIp.replace(/^.*:/, '');
 
-  const cleanNic = nic.trim().toUpperCase();
-  const cleanPhone = phone.trim().replace(/[\s\-\+\(\)]/g, '');
-  const cleanInstRef = institutionRef.trim().toUpperCase();
+  const cleanNic = (nic || '').trim().toUpperCase().replace(/[^0-9VX]/g, '');
+  const cleanPhone = (phone || '').trim().replace(/[\s\-\+\(\)]/g, '');
+  const cleanInstRef = (institutionRef || '').trim();
+
+  // Validate Institution Arrival number is strictly 4 digits
+  if (!/^\d{4}$/.test(cleanInstRef)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Institution Arrival number must be exactly 4 digits (e.g. 1234).'
+    });
+  }
+
+  // Validate Sri Lankan NIC (either 9 digits + V/X or 12 digits)
+  const isOldNic = /^\d{9}[VX]$/.test(cleanNic);
+  const isNewNic = /^\d{12}$/.test(cleanNic);
+  if (!isOldNic && !isNewNic) {
+    return res.status(400).json({
+      success: false,
+      error: 'Please enter a valid Sri Lankan National ID Number (NIC: 9 digits + V/X or 12 digits).'
+    });
+  }
+
+  // Compute all equivalent representations of this NIC so both 9-digit and 12-digit formats are treated as the exact same person
+  const nicVariants = getNicVariants(cleanNic);
+  const nicPlaceholders = nicVariants.map(() => '?').join(',');
 
   try {
     // Strict Rule 2: Multi-attempt cumulative limit check (Max 3 seats total per person)
-    // Block attempts if the same National ID, Attendance Ref, Phone number, or IP has already booked seats
+    // Block attempts if the same National ID (9-digit or 12-digit), Arrival Number, Phone number, or IP has already booked seats
     const existingBookings = await db.all(`
       SELECT id, booking_ref, full_name, nic, phone, institution_ref, seat_count, ip_address
       FROM bookings
       WHERE (status IS NULL OR status != 'CANCELLED')
         AND (
-          UPPER(TRIM(nic)) = ?
+          UPPER(TRIM(nic)) IN (${nicPlaceholders})
           OR UPPER(TRIM(institution_ref)) = ?
           OR replace(replace(replace(replace(phone, ' ', ''), '-', ''), '+', ''), '(', '') = ?
           OR (
@@ -206,7 +263,7 @@ app.post('/api/bookings', async (req, res) => {
             AND ip_address = ?
           )
         )
-    `, [cleanNic, cleanInstRef, cleanPhone, clientIp]);
+    `, [...nicVariants, cleanInstRef, cleanPhone, clientIp]);
 
     if (existingBookings && existingBookings.length > 0) {
       let totalAlreadyBooked = 0;
@@ -214,8 +271,14 @@ app.post('/api/bookings', async (req, res) => {
 
       for (const b of existingBookings) {
         totalAlreadyBooked += Number(b.seat_count || 0);
-        if (b.nic && b.nic.trim().toUpperCase() === cleanNic) triggers.push(`NIC: ${cleanNic}`);
-        if (b.institution_ref && b.institution_ref.trim().toUpperCase() === cleanInstRef) triggers.push(`Attendance Ref: ${cleanInstRef}`);
+        if (b.nic) {
+          const bVariants = getNicVariants(b.nic);
+          const isNicMatch = nicVariants.some(v => bVariants.includes(v));
+          if (isNicMatch) {
+            triggers.push(`NIC: ${cleanNic} (Matches existing record ${b.nic})`);
+          }
+        }
+        if (b.institution_ref && b.institution_ref.trim() === cleanInstRef) triggers.push(`Arrival No: ${cleanInstRef}`);
         const bPhone = (b.phone || '').replace(/[\s\-\+\(\)]/g, '');
         if (bPhone && bPhone === cleanPhone) triggers.push(`Phone: ${phone.trim()}`);
         if (clientIp && !['', 'unknown', '127.0.0.1', '::1', 'localhost'].includes(clientIp) && b.ip_address === clientIp) {
@@ -342,7 +405,7 @@ app.post('/api/bookings', async (req, res) => {
         venue: 'බත්තරමුල්ල සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය (Suhurupaya Auditorium, 19th Floor, Battaramulla)',
         date: '2026-10-05',
         time: '05:00 PM',
-        eventName: '"විභාසි" (Vibhasi) ප්‍රසංගය 2026 - සුහුරුපාය ශ්‍රවණාගාරය'
+        eventName: 'Department of Examinations, Sri Lanka - "විභාසි" (Vibhasi) Musical Concert 2026'
       }
     });
   } catch (err) {
@@ -423,7 +486,7 @@ app.get('/api/ticket/:ref', async (req, res) => {
         venue: 'බත්තරමුල්ල සුහුරුපාය 19 වන මහලේ ශ්‍රවණාගාරය (Suhurupaya Auditorium, 19th Floor, Battaramulla)',
         date: '2026-10-05',
         time: '05:00 PM',
-        eventName: '"විභාසි" (Vibhasi) ප්‍රසංගය 2026 - සුහුරුපාය ශ්‍රවණාගාරය'
+        eventName: 'Department of Examinations, Sri Lanka - "විභාසි" (Vibhasi) Musical Concert 2026'
       }
     });
   } catch (err) {
@@ -487,6 +550,21 @@ app.post('/api/gate/verify', async (req, res) => {
           booking = candidateBooking;
           scannedSeatId = possibleSeatId;
         }
+      }
+    }
+
+    // 4. Fallback: Manual lookup by NIC (supports both 9-digit and 12-digit formats) or 4-digit Arrival Number
+    if (!booking && token) {
+      const cleanToken = token.trim().toUpperCase().replace(/[^0-9VX]/g, '');
+      const tokenNicVariants = getNicVariants(cleanToken);
+      if (tokenNicVariants.length > 0) {
+        const placeholders = tokenNicVariants.map(() => '?').join(',');
+        booking = await db.get(
+          `SELECT * FROM bookings WHERE UPPER(TRIM(nic)) IN (${placeholders}) OR UPPER(TRIM(institution_ref)) = ?`,
+          [...tokenNicVariants, token.trim().toUpperCase()]
+        );
+      } else {
+        booking = await db.get('SELECT * FROM bookings WHERE UPPER(TRIM(institution_ref)) = ?', [token.trim().toUpperCase()]);
       }
     }
 
